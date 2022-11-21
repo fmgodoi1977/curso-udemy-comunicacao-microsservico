@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import userRepository from "../repository/userRepository.js";
+import userRepository from "../repository/UserRepository.js";
 import * as httpStatus from '../../../config/constants/httpStatus.js';
 import UserException from "../exception/UserException.js";
 import * as secrets from '../../../config/constants/secrets.js';
@@ -57,6 +57,8 @@ class UserService {
 
     async getAccessToken(req) {
         try {
+            const { transactionid, serviceid } = req.headers;
+            console.info(`Request to POST login with data ${JSON.stringify(req.body)} | [transactionId: ${transactionid} | serviceId: ${serviceid}]`);
             const { email, password } = req.body;
             this.validateAccessTokenData(email, password);
             let user = await userRepository.findByEmail(email);
@@ -64,10 +66,12 @@ class UserService {
             await this.validatePassword(password, user.password);
             const authUser = { id: user.id, name: user.name, email: user.email };
             const accessToken = jwt.sign({ authUser }, secrets.API_SECRET, { expiresIn: "1d" });
-            return {
+            let response = {
                 status: httpStatus.SUCCESS,
                 accessToken
             };
+            console.info(`Response to POST login with data ${JSON.stringify(response)} | [transactionId: ${transactionid} | serviceId: ${serviceid}]`);
+            return response;
         } catch (error) {
             return {
                 status: error.status ? error.status : httpStatus.INTERNAL_SERVER_ERROR,

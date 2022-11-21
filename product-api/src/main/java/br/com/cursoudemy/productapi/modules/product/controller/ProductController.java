@@ -67,8 +67,8 @@ public class ProductController {
 
 
     @GetMapping("{productId}/sales")
-    public ProductSalesResponse findProductSales(@PathVariable Integer id) {
-        return productService.findProductSales(id);
+    public ProductSalesResponse findProductSales(@PathVariable Integer productId) {
+        return productService.findProductSales(productId);
     }
 
 }
